@@ -31,12 +31,11 @@ state = [
     [0, 0, 0, 0],
 ]
 
-prev_i = None
-prev_j = None
-
-wait = False
+prev_i, prev_j = None, None
 
 while True:
+    wait = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -47,24 +46,19 @@ while True:
             x, y = event.pos
             click_i, click_j = x // 110, y // 110
 
-            # if not revealed yet
             if state[click_i][click_j] == 0:
 
-                # first one clicked
+                # first image clicked
                 if prev_i == None:
                     prev_i, prev_j = click_i, click_j
                     state[click_i][click_j] = 1
 
-                # second one clicked
+                # second image clicked
                 else:
                     if board[click_i][click_j] == board[prev_i][prev_j]:
-                        state[prev_i][prev_j] = 2
                         state[click_i][click_j] = 2
-
-                        # reset tiles
-                        prev_i = None
-                        prev_j = None
-
+                        state[prev_i][prev_j] = 2
+                        prev_i, prev_j = None, None
                     else:
                         state[click_i][click_j] = 1
                         wait = True
@@ -74,7 +68,8 @@ while True:
     for i in range(4):
         for j in range(4):
             if state[i][j] == 0:
-                pygame.draw.rect(screen, (255, 0, 0), (i * 110, j * 110, 100, 100))
+                pygame.draw.rect(screen, (255, 0, 0),
+                                 (i * 110, j * 110, 100, 100))
             else:
                 screen.blit(board[i][j], (i * 110, j * 110))
 
@@ -82,10 +77,7 @@ while True:
 
     if wait:
         pygame.time.wait(500)
-
-        # reset tiles
-        state[prev_i][prev_j] = 0
         state[click_i][click_j] = 0
-        prev_i = None
-        prev_j = None
-        wait = False
+        state[prev_i][prev_j] = 0
+        prev_i, prev_j = None, None
+
